@@ -5,8 +5,17 @@
   "serving_size": 2,
   "max_cook_time": 30,
   "skill_level": "普通",
-  "taste": ["偏咸", "偏辣"],
-  "cuisine_preferences": ["川菜", "徽菜"],
   "diet_type": "无限制",
-  "avoid_ingredients": ["羊肉", "内脏"]
+  "taste": [
+    "偏咸",
+    "偏辣"
+  ],
+  "cuisine_preferences": [
+    "川菜",
+    "徽菜"
+  ],
+  "avoid_ingredients": [
+    "羊肉",
+    "内脏"
+  ]
 }

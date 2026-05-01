@@ -6,11 +6,12 @@
     python src/config_editor.py
     python src/config_editor.py -p 9090
 
-访问 http://<IP>:8089 进行配置。
+自动在浏览器中打开编辑页面。
 """
 import json
 import os
 import sys
+import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
@@ -384,8 +385,10 @@ def main():
         PORT = int(args[1])
 
     server = HTTPServer(("0.0.0.0", PORT), ConfigHandler)
-    print(f"配置编辑器已启动，请访问 http://0.0.0.0:{PORT}")
+    url = f"http://localhost:{PORT}"
+    print(f"配置编辑器已启动: {url}")
     print("按 Ctrl+C 停止服务")
+    webbrowser.open(url)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
