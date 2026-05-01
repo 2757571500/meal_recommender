@@ -80,6 +80,12 @@ python src/recommend_daily.py
 # 运行菜品库更新
 python src/update_library.py
 
+# 启动配置网页编辑器（端口 8089）
+python src/config_editor.py
+
+# 指定端口
+python src/config_editor.py -p 9090
+
 # 手动去重
 python -c "from core.dish_manager import deduplicate; deduplicate()"
 
