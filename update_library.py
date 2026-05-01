@@ -3,6 +3,8 @@
 # 青龙面板定时任务：扩充菜品库（与推荐分开调度）
 # cron "30 6 * * 1" script-path=update_library.py,tag=更新菜品库
 # const $ = new Env('更新菜品库')
+#
+# 流程：加载配置 → 用户画像 → 枚举定义 → 获取天气 → AI JSON 发现 → 枚举校验 → 入库 → 推送
 
 import sys
 
@@ -10,22 +12,27 @@ import sys
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-from config import load_config
+from config import load_config, load_profile, load_enums
 from weather import get_weather
 from recommender import discover_dishes
 from push import send_push
 
 
 def main():
+    # 加载运行配置、用户画像、枚举定义
     config = load_config()
-    print(f"城市: {config.city}")
+    profile = load_profile()
+    enums = load_enums()
+
+    print(f"用户: {profile.hometown}")
     print(f"AI 模型: {config.ai.model}")
 
     weather_condition, weather_temp = get_weather(config.weather.city_code)
     print(f"天气: {weather_condition} {weather_temp}")
     print()
 
-    result = discover_dishes(config, weather_condition, weather_temp)
+    # 传入 enums 用于校验 AI 返回的字段值，profile 用于地域口味提示
+    result = discover_dishes(config, weather_condition, weather_temp, enums, profile)
     if result is None:
         print("菜品库更新失败。")
         send_push(
@@ -45,7 +52,7 @@ def main():
         print(f"\n更新完毕。{summary}。")
         send_push(
             config.push.push_url,
-            title=f"菜品库更新 | {config.city}",
+            title=f"菜品库更新 | {profile.hometown}",
             content=f"{summary}。\n\n{detail}" if detail else summary
         )
 
