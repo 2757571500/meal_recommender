@@ -130,9 +130,10 @@ def _build_prompt(weather_city, weather_condition, weather_temp, no_repeat_days,
     return prompt
 
 
-def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums):
+def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums, profile):
     """组装发给 AI 的菜品发现 Prompt。
 
+    包含用户常驻地和菜系偏好，确保 AI 推荐与本地饮食文化相符的菜品。
     要求 AI 返回 JSON 数组，字段值必须严格从枚举中取值。
     """
     now = datetime.now()
@@ -147,19 +148,24 @@ def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums)
     diet_type_list = "、".join(enums.get("diet_type", []))
     dietary_tags_list = "、".join(enums.get("dietary_tags", []))
 
+    cuisine_pref_str = "、".join(profile.cuisine_preferences) if profile.cuisine_preferences else "无特定偏好，根据当地饮食特色推荐"
+
     prompt = f"""你是一名熟悉中国各地饮食的美食专家。
 
 当前时令：{season}季（{month}月）
 所在地区：{weather_city}
 今日天气：{weather_condition} {weather_temp}
 
+用户常驻地：{profile.hometown}
+用户菜系偏好：{cuisine_pref_str}
 已有菜品库：{dish_list}
 
 请推荐 5-8 道不在以上菜品库中的新菜，加入菜品库。每道菜附上推荐理由。
 要求：
-1. 符合当前时令和地区饮食习惯
-2. 不能与已有菜品库中的菜重复
-3. 推荐理由需结合时令、天气、地区饮食习惯
+1. 符合当前时令和用户常驻地的饮食习惯
+2. 优先推荐用户偏好菜系的菜品
+3. 不能与已有菜品库中的菜重复
+4. 推荐理由需结合时令、天气、地区饮食习惯
 
 重要：请严格按以下 JSON 数组格式返回，不要包含其他内容，不要使用 markdown 代码块标记：
 
@@ -341,7 +347,7 @@ def discover_dishes(config, weather_condition, weather_temp, enums, profile):
         (added, updated) 元组，AI 调用失败时返回 None
     """
     client = AIClient(config.ai.base_url, config.ai.api_key, config.ai.model)
-    prompt = _build_discover_prompt(config.weather.city_code, weather_condition, weather_temp, enums)
+    prompt = _build_discover_prompt(config.weather.city_code, weather_condition, weather_temp, enums, profile)
 
     print("正在获取 AI 新菜推荐...")
     try:
