@@ -2,9 +2,9 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from push import send_push
+from core.push import send_push
 from unittest.mock import patch, MagicMock
 
 
@@ -20,7 +20,7 @@ class TestSendPush:
 
     def test_successful_push(self):
         """推送成功时返回正常。"""
-        with patch("push.requests.post") as mock_post:
+        with patch("core.push.requests.post") as mock_post:
             mock_response = MagicMock()
             mock_response.json.return_value = {"error_code": 0}
             mock_post.return_value = mock_response
@@ -30,7 +30,7 @@ class TestSendPush:
 
     def test_failed_push(self):
         """推送失败时打印错误不抛异常。"""
-        with patch("push.requests.post") as mock_post:
+        with patch("core.push.requests.post") as mock_post:
             mock_response = MagicMock()
             mock_response.json.return_value = {"error_code": 1, "error_message": "token error"}
             mock_post.return_value = mock_response
@@ -40,5 +40,5 @@ class TestSendPush:
 
     def test_network_error(self):
         """网络异常时打印错误不抛异常。"""
-        with patch("push.requests.post", side_effect=Exception("timeout")):
+        with patch("core.push.requests.post", side_effect=Exception("timeout")):
             send_push("https://push.example.com/api", "title", "content")

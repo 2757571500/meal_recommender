@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 def _cache_path():
     """cache.json 的绝对路径（与脚本同目录）。"""
-    return os.path.join(os.path.dirname(__file__), "cache.json")
+    return os.path.join(os.path.dirname(__file__), "..", "..", "data", "cache.json")
 
 
 def _load_cache():

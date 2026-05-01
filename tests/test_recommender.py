@@ -3,9 +3,9 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from recommender import (
+from core.recommender import (
     get_season, filter_dishes, _build_prompt,
     _build_discover_prompt, _parse_response,
     _parse_json_dish_list, _format_output,
@@ -130,7 +130,7 @@ class TestBuildPrompt:
 
     def test_prompt_contains_city_and_weather(self):
         """prompt 包含天气城市和天气信息。"""
-        from dish_manager import load_dishes
+        from core.dish_manager import load_dishes
         profile = SimpleNamespace(
             hometown="合肥", serving_size=2, max_cook_time=30,
             skill_level="普通", taste=["偏辣"], cuisine_preferences=["川菜"],
@@ -151,7 +151,7 @@ class TestBuildPrompt:
 
     def test_prompt_contains_excluded_list(self):
         """prompt 包含排除列表。"""
-        from dish_manager import load_dishes
+        from core.dish_manager import load_dishes
         profile = SimpleNamespace(
             hometown="合肥", serving_size=1, max_cook_time=30,
             skill_level="新手", taste=[], cuisine_preferences=[],

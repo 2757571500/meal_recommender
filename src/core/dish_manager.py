@@ -18,7 +18,7 @@ def _clean_name(name):
 
 def _dishes_path():
     """返回 dishes.json 的绝对路径（与脚本同目录）。"""
-    return os.path.join(os.path.dirname(__file__), "dishes.json")
+    return os.path.join(os.path.dirname(__file__), "..", "..", "data", "dishes.json")
 
 
 def load_dishes():

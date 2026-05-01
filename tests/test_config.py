@@ -3,9 +3,9 @@ import sys
 from pathlib import Path
 
 # 确保能导入项目模块
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from config import load_config, load_profile, load_enums
+from core.config import load_config, load_profile, load_enums
 
 
 class TestLoadConfig:

@@ -4,9 +4,9 @@ import json
 from pathlib import Path
 from datetime import datetime, timedelta
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from cache_manager import get_excluded_dishes, add_record, cleanup
+from core.cache_manager import get_excluded_dishes, add_record, cleanup
 
 
 class TestCacheManager:
@@ -15,12 +15,12 @@ class TestCacheManager:
 
     def setup_method(self):
         """保存原始缓存内容。"""
-        from cache_manager import _load_cache
+        from core.cache_manager import _load_cache
         self._original = _load_cache()
 
     def teardown_method(self):
         """恢复原始缓存内容。"""
-        from cache_manager import _save_cache
+        from core.cache_manager import _save_cache
         _save_cache(self._original)
 
     def test_add_and_get_excluded(self):
@@ -31,7 +31,7 @@ class TestCacheManager:
 
     def test_record_with_meal_type(self):
         """记录包含餐段信息。"""
-        from cache_manager import _load_cache
+        from core.cache_manager import _load_cache
         add_record(["测试菜"], "午餐")
         cache = _load_cache()
         found = [r for r in cache["records"] if r["name"] == "测试菜"]
@@ -39,7 +39,7 @@ class TestCacheManager:
 
     def test_get_excluded_beyond_days(self):
         """超出 no_repeat_days 的记录不被排除。"""
-        from cache_manager import _load_cache, _save_cache
+        from core.cache_manager import _load_cache, _save_cache
         # 插入一条 30 天前的记录
         cache = _load_cache()
         old_date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
@@ -54,7 +54,7 @@ class TestCacheManager:
 
     def test_cleanup_removes_old_records(self):
         """清理超过指定天数的记录。"""
-        from cache_manager import _load_cache, _save_cache
+        from core.cache_manager import _load_cache, _save_cache
         cache = _load_cache()
         old_date = (datetime.now() - timedelta(days=15)).strftime("%Y-%m-%d")
         cache["records"].append({"name": "过期菜", "date": old_date, "meal": "午餐"})
@@ -68,7 +68,7 @@ class TestCacheManager:
 
     def test_cleanup_preserves_recent(self):
         """清理保留指定天数内的记录。"""
-        from cache_manager import _load_cache, _save_cache
+        from core.cache_manager import _load_cache, _save_cache
         cache = _load_cache()
         today = datetime.now().strftime("%Y-%m-%d")
         cache["records"].append({"name": "今日菜", "date": today, "meal": "午餐"})
@@ -81,7 +81,7 @@ class TestCacheManager:
 
     def test_empty_cache_returns_empty(self):
         """缓存文件不存在时返回空集合。"""
-        from cache_manager import _load_cache, _save_cache
+        from core.cache_manager import _load_cache, _save_cache
         # 清空缓存
         _save_cache({"records": []})
         excluded = get_excluded_dishes(7)

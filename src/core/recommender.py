@@ -8,9 +8,9 @@
 import json
 import re
 from datetime import datetime
-from ai_client import AIClient
-from dish_manager import list_dish_names, add_new_dishes, load_dishes
-from cache_manager import get_excluded_dishes, add_record
+from core.ai_client import AIClient
+from core.dish_manager import list_dish_names, add_new_dishes, load_dishes
+from core.cache_manager import get_excluded_dishes, add_record
 
 
 def get_season(month=None):

@@ -12,10 +12,10 @@ import sys
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-from config import load_config, load_profile, load_enums
-from weather import get_weather
-from recommender import discover_dishes
-from push import send_push
+from core.config import load_config, load_profile, load_enums
+from core.weather import get_weather
+from core.recommender import discover_dishes
+from core.push import send_push
 
 
 def main():

@@ -18,7 +18,7 @@ def load_config(path=None):
         包含运行配置的 SimpleNamespace 对象
     """
     if path is None:
-        path = os.path.join(os.path.dirname(__file__), "config.json")
+        path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "config.json")
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     cfg = SimpleNamespace()
@@ -38,7 +38,7 @@ def load_profile(path=None):
         包含用户偏好信息的 SimpleNamespace 对象
     """
     if path is None:
-        path = os.path.join(os.path.dirname(__file__), "profile.json")
+        path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "profile.json")
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     return SimpleNamespace(**data)
@@ -53,6 +53,6 @@ def load_enums(path=None):
         包含所有枚举值定义的字典
     """
     if path is None:
-        path = os.path.join(os.path.dirname(__file__), "enums.json")
+        path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "enums.json")
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)

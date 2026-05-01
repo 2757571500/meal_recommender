@@ -2,9 +2,9 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from ai_client import AIClient
+from core.ai_client import AIClient
 from unittest.mock import patch, MagicMock
 
 
@@ -13,7 +13,7 @@ class TestAIClient:
     def test_chat_network_error(self):
         """网络异常向上抛出。"""
         client = AIClient("https://api.example.com", "sk-test", "test-model")
-        with patch("ai_client.requests.post", side_effect=Exception("connection error")):
+        with patch("core.ai_client.requests.post", side_effect=Exception("connection error")):
             import pytest
             with pytest.raises(Exception):
                 client.chat([{"role": "user", "content": "hi"}])
@@ -21,7 +21,7 @@ class TestAIClient:
     def test_chat_http_error(self):
         """HTTP 状态码异常向上抛出。"""
         client = AIClient("https://api.example.com", "sk-test", "test-model")
-        with patch("ai_client.requests.post") as mock_post:
+        with patch("core.ai_client.requests.post") as mock_post:
             mock_response = MagicMock()
             mock_response.raise_for_status.side_effect = Exception("HTTP 401")
             mock_post.return_value = mock_response
@@ -33,7 +33,7 @@ class TestAIClient:
     def test_chat_success(self):
         """正常返回文本。"""
         client = AIClient("https://api.example.com", "sk-test", "test-model")
-        with patch("ai_client.requests.post") as mock_post:
+        with patch("core.ai_client.requests.post") as mock_post:
             mock_response = MagicMock()
             mock_response.json.return_value = {
                 "choices": [{"message": {"content": "你好"}}]
@@ -46,12 +46,12 @@ class TestAIClient:
     def test_chat_empty_choices(self):
         """空 choices 抛异常。"""
         client = AIClient("https://api.example.com", "sk-test", "test-model")
-        with patch("ai_client.requests.post") as mock_post:
+        with patch("core.ai_client.requests.post") as mock_post:
             mock_response = MagicMock()
             mock_response.json.return_value = {"choices": []}
             mock_post.return_value = mock_response
 
-            with patch("ai_client.requests.post") as mp:
+            with patch("core.ai_client.requests.post") as mp:
                 mp.return_value = mock_response
                 import pytest
                 with pytest.raises(Exception):

@@ -3,9 +3,9 @@ import sys
 import json
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from dish_manager import (
+from core.dish_manager import (
     load_dishes, save_dishes, validate_dish, validate_dish_list,
     add_new_dishes, deduplicate, list_dish_names,
 )
@@ -96,11 +96,8 @@ class TestDishCRUD:
         dishes = load_dishes()
         assert isinstance(dishes, list)
 
-    def test_save_and_load(self, tmp_dishes_file):
+    def test_save_and_load(self, patch_dishes_path):
         """写入后重新读取内容一致。"""
-        from dish_manager import _dishes_path, _dishes_path as dp
-        original = dp
-
         dishes = [{"name": "测试菜", "cuisine": "川菜", "taste": ["辣"], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": []}]
         save_dishes(dishes)
         loaded = load_dishes()
@@ -121,54 +118,32 @@ class TestDishCRUD:
 
 class TestAddNewDishes:
 
-    def test_add_new_dish_without_enums(self):
+    def test_add_new_dish_without_enums(self, patch_dishes_path):
         """不传 enums 时不校验，直接入库。"""
-        # 清空后再加一道
-        from dish_manager import save_dishes, load_dishes, add_new_dishes
-        current = load_dishes()
-        count_before = len(current)
-
         new = [{"name": "测试新增菜", "cuisine": "川菜", "taste": ["辣"], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": []}]
         added, updated = add_new_dishes(new)
-        assert len(added) == 1 or len(added) == 0  # 可能已存在同名
+        assert len(added) == 1
+        assert updated == []
 
-        # 清理：恢复原状
-        save_dishes(current)
-
-    def test_add_with_enum_validation_passes(self, enums):
+    def test_add_with_enum_validation_passes(self, enums, patch_dishes_path):
         """传入 enums 且数据合法时正常入库。"""
-        from dish_manager import save_dishes, load_dishes, add_new_dishes
-        current = load_dishes()
-        count_before = len(current)
-
-        new = [{"name": f"枚举校验菜", "cuisine": "川菜", "taste": ["辣"], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": []}]
+        new = [{"name": "枚举校验菜", "cuisine": "川菜", "taste": ["辣"], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": []}]
         added, updated = add_new_dishes(new, enums=enums)
-        # 可能已存在同名
-        assert isinstance(added, list)
-        assert isinstance(updated, list)
+        assert len(added) == 1
+        assert updated == []
 
-        save_dishes(current)
-
-    def test_add_with_enum_validation_fails(self, enums):
+    def test_add_with_enum_validation_fails(self, enums, patch_dishes_path):
         """传入 enums 且数据非法时跳过。"""
-        from dish_manager import save_dishes, load_dishes, add_new_dishes
-        current = load_dishes()
-
         new = [{"name": "非法菜", "cuisine": "火星菜", "taste": [], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": []}]
         added, updated = add_new_dishes(new, enums=enums)
         assert added == []
         assert updated == []
 
-        save_dishes(current)
-
 
 class TestDeduplicate:
 
-    def test_deduplicate_preserves_newest_reason(self):
+    def test_deduplicate_preserves_newest_reason(self, patch_dishes_path):
         """去重后保留第一个出现的记录。"""
-        from dish_manager import save_dishes, load_dishes, deduplicate
-        current = load_dishes()
-
         test_data = [
             {"name": "重复菜", "cuisine": "川菜", "taste": ["辣"], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": [], "reason": "版本1"},
             {"name": "重复菜", "cuisine": "川菜", "taste": ["辣"], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": [], "reason": "版本2"},
@@ -176,14 +151,10 @@ class TestDeduplicate:
         save_dishes(test_data)
         result = deduplicate()
         assert len(result) == 1
+        assert result[0]["reason"] == "版本1"
 
-        save_dishes(current)
-
-    def test_no_duplicates_unchanged(self):
+    def test_no_duplicates_unchanged(self, patch_dishes_path):
         """无重复时原样返回。"""
-        from dish_manager import save_dishes, load_dishes, deduplicate
-        current = load_dishes()
-
         test_data = [
             {"name": "菜A", "cuisine": "川菜", "taste": ["辣"], "difficulty": "新手", "prep_time": 5, "ingredients": ["x"], "diet_type": "无限制", "dietary_tags": []},
             {"name": "菜B", "cuisine": "徽菜", "taste": ["咸"], "difficulty": "普通", "prep_time": 10, "ingredients": ["y"], "diet_type": "无限制", "dietary_tags": []},
@@ -191,5 +162,3 @@ class TestDeduplicate:
         save_dishes(test_data)
         result = deduplicate()
         assert len(result) == 2
-
-        save_dishes(current)

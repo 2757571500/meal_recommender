@@ -1,6 +1,7 @@
 """测试共用 fixture：临时文件、枚举、画像、示例菜品。"""
 import json
 import pytest
+from pathlib import Path
 
 
 @pytest.fixture
@@ -83,3 +84,11 @@ def tmp_enums(tmp_path):
 def tmp_dishes_file(tmp_path):
     """返回一个临时 dishes.json 路径（不创建文件）。"""
     return tmp_path / "dishes.json"
+
+
+@pytest.fixture
+def patch_dishes_path(monkeypatch, tmp_path):
+    """将 _dishes_path 重定向到临时路径，避免修改真实文件。"""
+    test_path = tmp_path / "dishes.json"
+    monkeypatch.setattr("core.dish_manager._dishes_path", lambda: str(test_path))
+    return test_path

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -- coding: utf-8 --
 # 青龙面板定时任务：每日三餐推荐
-# cron "30 8 * * *" script-path=main.py,tag=每日三餐推荐
+# cron "30 8 * * *" script-path=src/recommend_daily.py,tag=每日三餐推荐
 # const $ = new Env('每日三餐推荐')
 #
 # 流程：加载配置 → 用户画像 → 检测菜品库 → 获取天气 → 硬过滤 → AI 推荐 → 推送
@@ -12,11 +12,11 @@ import sys
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-from config import load_config, load_profile, load_enums
-from weather import get_weather
-from recommender import recommend
-from push import send_push
-from dish_manager import load_dishes
+from core.config import load_config, load_profile, load_enums
+from core.weather import get_weather
+from core.recommender import recommend
+from core.push import send_push
+from core.dish_manager import load_dishes
 
 
 def main():
