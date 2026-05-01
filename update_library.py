@@ -27,12 +27,12 @@ def main():
     print(f"用户: {profile.hometown}")
     print(f"AI 模型: {config.ai.model}")
 
-    weather_condition, weather_temp = get_weather(config.weather.city_code)
-    print(f"天气: {weather_condition} {weather_temp}")
+    weather_condition, weather_temp, weather_city = get_weather(config.weather.city_code)
+    print(f"天气: {weather_city} {weather_condition} {weather_temp}")
     print()
 
     # 传入 enums 用于校验 AI 返回的字段值，profile 用于地域口味提示
-    result = discover_dishes(config, weather_condition, weather_temp, enums, profile)
+    result = discover_dishes(config, weather_condition, weather_temp, enums, profile, weather_city)
     if result is None:
         print("菜品库更新失败。")
         send_push(

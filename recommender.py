@@ -74,14 +74,20 @@ def filter_dishes(dishes, profile):
 def _build_prompt(weather_city, weather_condition, weather_temp, no_repeat_days, profile, filtered_dishes):
     """组装发给 AI 的推荐 Prompt。
 
-    包含当前天气城市和用户常驻地两套地理信息，覆盖出差场景。
+    包含当前天气城市名和用户常驻地两套地理信息，覆盖出差场景。
+    菜品列表附带元数据（菜系、口味、难度、耗时），帮助 AI 精准匹配。
     """
     now = datetime.now()
     season = get_season(now.month)
     month = now.month
 
-    dish_names = [d["name"] for d in filtered_dishes]
-    dish_list = "、".join(dish_names) if dish_names else "（暂无菜品库）"
+    # 菜品列表附带元数据，每行一道菜
+    dish_lines = []
+    for d in filtered_dishes:
+        taste_str = "、".join(d.get("taste", []))
+        tags = "、".join(d.get("dietary_tags", [])) or "无"
+        dish_lines.append(f"  - {d['name']}（{d['cuisine']} | {d['difficulty']} | {d['prep_time']}分钟 | {taste_str} | {tags}）")
+    dish_text = "\n".join(dish_lines) if dish_lines else "（暂无菜品库）"
 
     excluded = get_excluded_dishes(no_repeat_days)
     excluded_list = "、".join(sorted(excluded)) if excluded else "（无）"
@@ -104,7 +110,8 @@ def _build_prompt(weather_city, weather_condition, weather_temp, no_repeat_days,
 菜系偏好：{cuisine_str}
 忌口食材：{avoid_str}
 
-已有菜品库（已根据饮食偏好筛选）：{dish_list}
+已有菜品库（已根据饮食偏好筛选，附元数据）：
+{dish_text}
 
 最近{no_repeat_days}天内推荐过的菜品（请避开）：{excluded_list}
 
@@ -133,7 +140,8 @@ def _build_prompt(weather_city, weather_condition, weather_temp, no_repeat_days,
 def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums, profile):
     """组装发给 AI 的菜品发现 Prompt。
 
-    包含用户常驻地和菜系偏好，确保 AI 推荐与本地饮食文化相符的菜品。
+    包含用户常驻地、菜系偏好、口味、饮食限制等画像信息，
+    确保 AI 推荐的菜品符合用户整体饮食风格。
     要求 AI 返回 JSON 数组，字段值必须严格从枚举中取值。
     """
     now = datetime.now()
@@ -149,6 +157,8 @@ def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums,
     dietary_tags_list = "、".join(enums.get("dietary_tags", []))
 
     cuisine_pref_str = "、".join(profile.cuisine_preferences) if profile.cuisine_preferences else "无特定偏好，根据当地饮食特色推荐"
+    taste_pref_str = "、".join(profile.taste) if profile.taste else "无特定偏好"
+    avoid_str = "、".join(profile.avoid_ingredients) if profile.avoid_ingredients else "无"
 
     prompt = f"""你是一名熟悉中国各地饮食的美食专家。
 
@@ -158,14 +168,19 @@ def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums,
 
 用户常驻地：{profile.hometown}
 用户菜系偏好：{cuisine_pref_str}
+用户口味偏好：{taste_pref_str}
+用户饮食类型：{profile.diet_type}
+忌口食材：{avoid_str}
 已有菜品库：{dish_list}
 
 请推荐 5-8 道不在以上菜品库中的新菜，加入菜品库。每道菜附上推荐理由。
 要求：
 1. 符合当前时令和用户常驻地的饮食习惯
 2. 优先推荐用户偏好菜系的菜品
-3. 不能与已有菜品库中的菜重复
-4. 推荐理由需结合时令、天气、地区饮食习惯
+3. 符合用户口味偏好和饮食类型
+4. 避开忌口食材
+5. 不能与已有菜品库中的菜重复
+6. 推荐理由需结合时令、天气、地区饮食习惯
 
 重要：请严格按以下 JSON 数组格式返回，不要包含其他内容，不要使用 markdown 代码块标记：
 
@@ -270,7 +285,7 @@ def _format_output(profile, result):
     return "\n".join(lines)
 
 
-def recommend(config, weather_condition, weather_temp, profile, enums):
+def recommend(config, weather_condition, weather_temp, profile, enums, weather_city):
     """推荐主流程：从已有菜品库中选菜推荐今日午餐和晚餐。
 
     流程：
@@ -287,6 +302,7 @@ def recommend(config, weather_condition, weather_temp, profile, enums):
         weather_temp: 温度
         profile: 用户画像
         enums: 枚举定义
+        weather_city: 天气城市名（用于 prompt 中的地理位置）
     返回：
         格式化后的推荐文本，AI 调用失败或菜品库为空时返回 None
     """
@@ -303,7 +319,7 @@ def recommend(config, weather_condition, weather_temp, profile, enums):
     print(f"菜品库共 {len(all_dishes)} 道菜，过滤后 {len(filtered)} 道可用")
 
     client = AIClient(config.ai.base_url, config.ai.api_key, config.ai.model)
-    prompt = _build_prompt(config.weather.city_code, weather_condition, weather_temp,
+    prompt = _build_prompt(weather_city, weather_condition, weather_temp,
                           config.cache.no_repeat_days, profile, filtered)
 
     print("正在获取 AI 推荐...")
@@ -328,7 +344,7 @@ def recommend(config, weather_condition, weather_temp, profile, enums):
     return output
 
 
-def discover_dishes(config, weather_condition, weather_temp, enums, profile):
+def discover_dishes(config, weather_condition, weather_temp, enums, profile, weather_city):
     """菜品库更新：调用 AI 发现新菜，自动入库。
 
     流程：
@@ -343,11 +359,12 @@ def discover_dishes(config, weather_condition, weather_temp, enums, profile):
         weather_temp: 温度
         enums: 枚举定义
         profile: 用户画像
+        weather_city: 天气城市名
     返回：
         (added, updated) 元组，AI 调用失败时返回 None
     """
     client = AIClient(config.ai.base_url, config.ai.api_key, config.ai.model)
-    prompt = _build_discover_prompt(config.weather.city_code, weather_condition, weather_temp, enums, profile)
+    prompt = _build_discover_prompt(weather_city, weather_condition, weather_temp, enums, profile)
 
     print("正在获取 AI 新菜推荐...")
     try:

@@ -35,11 +35,11 @@ def main():
     print(f"AI 模型: {config.ai.model}")
     print(f"不重复天数: {config.cache.no_repeat_days}")
 
-    weather_condition, weather_temp = get_weather(config.weather.city_code)
-    print(f"天气: {weather_condition} {weather_temp}")
+    weather_condition, weather_temp, weather_city = get_weather(config.weather.city_code)
+    print(f"天气: {weather_city} {weather_condition} {weather_temp}")
     print()
 
-    output = recommend(config, weather_condition, weather_temp, profile, enums)
+    output = recommend(config, weather_condition, weather_temp, profile, enums, weather_city)
     if output:
         print(output)
         send_push(
