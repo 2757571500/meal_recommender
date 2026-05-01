@@ -1,0 +1,9 @@
+# 配置文件包含敏感信息（API Key、推送 Token）
+config.json
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# Claude Code 内部配置
+.claude/
