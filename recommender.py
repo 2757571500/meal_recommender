@@ -323,6 +323,9 @@ def recommend(config, weather_condition, weather_temp, profile, enums, weather_c
                           config.cache.no_repeat_days, profile, filtered)
 
     print("正在获取 AI 推荐...")
+    print("===== 推荐 Prompt =====")
+    print(prompt)
+    print("=======================")
     try:
         text = client.chat([
             {"role": "system", "content": "你是美食专家，只返回指定格式的结果。"},
@@ -367,6 +370,9 @@ def discover_dishes(config, weather_condition, weather_temp, enums, profile, wea
     prompt = _build_discover_prompt(weather_city, weather_condition, weather_temp, enums, profile)
 
     print("正在获取 AI 新菜推荐...")
+    print("===== 发现菜品 Prompt =====")
+    print(prompt)
+    print("============================")
     try:
         text = client.chat([
             {"role": "system", "content": "你是美食专家，只返回指定格式的 JSON 数组。"},
