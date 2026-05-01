@@ -33,9 +33,9 @@ def main():
 
     print(f"用户: {profile.hometown}")
     print(f"AI 模型: {config.ai.model}")
-    print(f"不重复天数: {config.cache.no_repeat_days}")
+    print(f"不重复天数: {profile.no_repeat_days}")
 
-    weather_condition, weather_temp, weather_city = get_weather(config.weather.city_code)
+    weather_condition, weather_temp, weather_city = get_weather(profile.weather_city_code)
     print(f"天气: {weather_city} {weather_condition} {weather_temp}")
     print()
 

@@ -321,7 +321,7 @@ def recommend(config, weather_condition, weather_temp, profile, enums, weather_c
 
     client = AIClient(config.ai.base_url, config.ai.api_key, config.ai.model)
     prompt = _build_prompt(weather_city, weather_condition, weather_temp,
-                          config.cache.no_repeat_days, profile, filtered)
+                          profile.no_repeat_days, profile, filtered)
 
     print("正在获取 AI 推荐...")
     print("===== 推荐 Prompt =====")

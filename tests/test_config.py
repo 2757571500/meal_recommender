@@ -15,14 +15,13 @@ class TestLoadConfig:
         """加载真实 config.json，确认能正常读取。"""
         cfg = load_config()
         assert hasattr(cfg, "ai")
-        assert hasattr(cfg, "weather")
-        assert hasattr(cfg, "cache")
         assert hasattr(cfg, "push")
         assert hasattr(cfg.ai, "base_url")
         assert hasattr(cfg.ai, "model")
         assert hasattr(cfg.ai, "api_key")
-        # city 字段已移除
-        assert not hasattr(cfg, "city")
+        # weather/cache 已移至 profile.json
+        assert not hasattr(cfg, "weather")
+        assert not hasattr(cfg, "cache")
 
     def test_load_ai_config(self):
         """AI 段配置点号访问正常。"""
@@ -32,7 +31,7 @@ class TestLoadConfig:
     def test_load_with_custom_path(self, tmp_path):
         """通过自定义路径加载。"""
         path = tmp_path / "config.json"
-        path.write_text('{"ai": {"base_url": "x", "api_key": "y", "model": "z"}, "weather": {"provider": "itboy", "city_code": "101220101"}, "cache": {"no_repeat_days": 7}, "push": {"push_url": ""}}')
+        path.write_text('{"ai": {"base_url": "x", "api_key": "y", "model": "z"}, "push": {"push_url": ""}}')
         cfg = load_config(str(path))
         assert cfg.ai.model == "z"
 
@@ -43,6 +42,8 @@ class TestLoadProfile:
         """加载真实 profile.json 确认字段完整。"""
         p = load_profile()
         assert p.hometown == "合肥"
+        assert p.weather_city_code == "101220101"
+        assert p.no_repeat_days == 7
         assert p.serving_size == 2
         assert p.max_cook_time == 30
         assert p.skill_level == "普通"
@@ -59,6 +60,8 @@ class TestLoadProfile:
     def test_profile_types(self):
         """字段类型正确。"""
         p = load_profile()
+        assert isinstance(p.weather_city_code, str)
+        assert isinstance(p.no_repeat_days, int)
         assert isinstance(p.serving_size, int)
         assert isinstance(p.max_cook_time, int)
         assert isinstance(p.taste, list)

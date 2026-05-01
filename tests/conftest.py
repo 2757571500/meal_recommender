@@ -49,6 +49,8 @@ def tmp_profile(tmp_path):
     """写入临时 profile.json 并返回路径。"""
     data = {
         "hometown": "合肥",
+        "weather_city_code": "101220101",
+        "no_repeat_days": 7,
         "serving_size": 2,
         "max_cook_time": 30,
         "skill_level": "普通",

@@ -23,8 +23,6 @@ def load_config(path=None):
         data = json.load(f)
     cfg = SimpleNamespace()
     cfg.ai = SimpleNamespace(**data["ai"])
-    cfg.weather = SimpleNamespace(**data["weather"])
-    cfg.cache = SimpleNamespace(**data["cache"])
     cfg.push = SimpleNamespace(**data["push"])
     return cfg
 
