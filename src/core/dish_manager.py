@@ -39,7 +39,7 @@ def save_dishes(dishes):
 def validate_dish(dish, enums):
     """校验单条菜品字段值是否在 enums 允许范围内。
 
-    校验字段：cuisine、taste、difficulty、diet_type、dietary_tags
+    校验字段：cuisine、taste、difficulty、dietary_tags
     超范围的字段值会被记录并跳过，不阻塞其他有效菜品入库。
 
     参数：
@@ -55,10 +55,6 @@ def validate_dish(dish, enums):
     # difficulty（单值枚举，复用 skill_level）
     if dish.get("difficulty") not in enums.get("skill_level", []):
         return False, f"difficulty '{dish.get('difficulty')}' 不在枚举范围内"
-
-    # diet_type（单值枚举）
-    if dish.get("diet_type") not in enums.get("diet_type", []):
-        return False, f"diet_type '{dish.get('diet_type')}' 不在枚举范围内"
 
     # taste（多值枚举，从 dish_taste 取值）
     valid_tastes = enums.get("dish_taste", [])

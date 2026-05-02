@@ -31,9 +31,8 @@ def filter_dishes(dishes, profile):
     """根据用户画像对菜品库做硬过滤。
 
     过滤规则：
-    1. diet_type：用户无限制则全部保留；有限制则保留"匹配类型 + 无限制"菜品
-    2. difficulty：菜品难度不高于用户 skill_level（新手 < 普通 < 熟练）
-    3. prep_time：菜品耗时不超过用户 max_cook_time
+    1. difficulty：菜品难度不高于用户 skill_level（新手 < 普通 < 熟练）
+    2. prep_time：菜品耗时不超过用户 max_cook_time
 
     参数：
         dishes: 菜品字典列表
@@ -45,19 +44,8 @@ def filter_dishes(dishes, profile):
     difficulty_order = {"新手": 0, "普通": 1, "熟练": 2}
     user_level = difficulty_order.get(profile.skill_level, 1)
 
-    # diet_type 可保留的类型集合
-    # 用户不限时保留全部；有限制时保留"匹配 + 不限"菜品
-    if profile.diet_type == "不限":
-        keep_diet_types = None  # None 表示全部保留
-    else:
-        keep_diet_types = {profile.diet_type, "不限"}
-
     filtered = []
     for d in dishes:
-        # diet_type 过滤
-        if keep_diet_types is not None and d.get("diet_type") not in keep_diet_types:
-            continue
-
         # 难度过滤：菜品难度不能高于用户水平
         if difficulty_order.get(d.get("difficulty", "普通"), 1) > user_level:
             continue
@@ -153,7 +141,6 @@ def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums,
 
     cuisine_list = "、".join(enums.get("cuisine", []))
     taste_list = "、".join(enums.get("dish_taste", []))
-    diet_type_list = "、".join(enums.get("diet_type", []))
     dietary_tags_list = "、".join(enums.get("dietary_tags", []))
 
     cuisine_pref_str = "、".join(profile.cuisine_preferences) if profile.cuisine_preferences else "无特定偏好，根据当地饮食特色推荐"
@@ -169,7 +156,6 @@ def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums,
 用户常驻地：{profile.hometown}
 用户菜系偏好：{cuisine_pref_str}
 用户口味偏好：{taste_pref_str}
-用户饮食类型：{profile.diet_type}
 忌口食材：{avoid_str}
 已有菜品库：{dish_list}
 
@@ -194,7 +180,6 @@ def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums,
     "difficulty": "难度",
     "prep_time": 烹饪分钟数(整数),
     "ingredients": ["主要食材"],
-    "diet_type": "饮食类型",
     "dietary_tags": ["特殊标签"]
   }}
 ]
@@ -203,7 +188,6 @@ def _build_discover_prompt(weather_city, weather_condition, weather_temp, enums,
 - cuisine（选一）：{cuisine_list}
 - taste（可多选）：{taste_list}
 - difficulty（选一）：新手、普通、熟练
-- diet_type（选一）：{diet_type_list}
 - dietary_tags（可多选，无则留空数组）：{dietary_tags_list}"""
     return prompt
 
