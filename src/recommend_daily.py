@@ -22,7 +22,11 @@ from core.dish_manager import load_dishes
 def main():
     # 加载运行配置、用户画像、枚举定义
     config = load_config()
+    if config is None:
+        exit(1)
     profile = load_profile()
+    if profile is None:
+        exit(1)
     enums = load_enums()
 
     # 检测菜品库是否为空（首次使用需先跑 update_library.py 填充）

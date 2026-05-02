@@ -9,6 +9,21 @@ import os
 from types import SimpleNamespace
 
 
+def _data_path(filename):
+    """返回 data/ 下某文件的绝对路径。"""
+    return os.path.join(os.path.dirname(__file__), "..", "..", "data", filename)
+
+
+def _check_example(filename):
+    """配置文件缺失时打印引导信息，提示用户从 example 模板复制。"""
+    path = _data_path(filename)
+    example = _data_path(filename.replace(".json", ".example.json"))
+    print(f"[配置缺失] 未找到 {path}")
+    if os.path.exists(example):
+        print(f"  请复制模板文件并填入真实凭据：")
+        print(f"    cp {example} {path}")
+
+
 def load_config(path=None):
     """读取 config.json，返回 SimpleNamespace 对象以支持 cfg.ai.model 式访问。
 
@@ -18,7 +33,10 @@ def load_config(path=None):
         包含运行配置的 SimpleNamespace 对象
     """
     if path is None:
-        path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "config.json")
+        path = _data_path("config.json")
+    if not os.path.exists(path):
+        _check_example("config.json")
+        return None
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     cfg = SimpleNamespace()
@@ -36,7 +54,10 @@ def load_profile(path=None):
         包含用户偏好信息的 SimpleNamespace 对象
     """
     if path is None:
-        path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "profile.json")
+        path = _data_path("profile.json")
+    if not os.path.exists(path):
+        _check_example("profile.json")
+        return None
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     return SimpleNamespace(**data)
@@ -51,6 +72,11 @@ def load_enums(path=None):
         包含所有枚举值定义的字典
     """
     if path is None:
-        path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "enums.json")
+        path = _data_path("enums.json")
+    if not os.path.exists(path):
+        print(f"[配置缺失] 未找到 {path}")
+        print(f"  enums.json 是系统运行必需的枚举定义文件，无法自动生成。")
+        print(f"  请确保 data/ 目录完整，或从 Git 仓库拉取最新版本。")
+        return {}
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)

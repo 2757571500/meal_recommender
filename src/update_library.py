@@ -21,7 +21,11 @@ from core.push import send_push
 def main():
     # 加载运行配置、用户画像、枚举定义
     config = load_config()
+    if config is None:
+        exit(1)
     profile = load_profile()
+    if profile is None:
+        exit(1)
     enums = load_enums()
 
     print(f"用户: {profile.hometown}")

@@ -1,0 +1,11 @@
+{
+  "ai": {
+    "provider": "longcat",
+    "base_url": "https://api.longcat.chat/openai",
+    "api_key": "YOUR_API_KEY_HERE",
+    "model": "LongCat-Flash-Chat-2602-Exp"
+  },
+  "push": {
+    "push_url": "https://push.showdoc.com.cn/server/api/push/｛token｝"
+  }
+}

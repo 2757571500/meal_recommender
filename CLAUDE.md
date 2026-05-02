@@ -68,23 +68,23 @@ git commit -m "初始提交：AI三餐推荐系统"
 ```
 
 - `data/config.json` 已在 `.gitignore` 中（包含 API Key 和推送 Token），提交前确认不误传
+- 所有文档文件（实施计划、设计文档、需求文档等）中的配置示例**必须使用占位符**，严禁写入真实凭据
+- 提交前做敏感信息检查：`git diff --cached | grep -E 'api_key|push_url|sk-|token' | grep -v 'YOUR_' | grep -v '｛'`
 - 提交信息用中文撰写，简明说明变更原因
 - 功能变更后同步更新 `资料库/需求文档/` 中的变更记录
 
 ## 开发命令
 
 ```bash
+# 首次使用：从模板复制配置文件
+cp data/config.example.json data/config.json
+cp data/profile.example.json data/profile.json
+
 # 运行主推荐流程
 python src/recommend_daily.py
 
 # 运行菜品库更新
 python src/update_library.py
-
-# 启动配置网页编辑器（端口 8089）
-python src/config_editor.py
-
-# 指定端口
-python src/config_editor.py -p 9090
 
 # 手动去重
 python -c "from core.dish_manager import deduplicate; deduplicate()"
@@ -94,6 +94,18 @@ python -c "from core.cache_manager import cleanup; cleanup(30)"
 ```
 
 无包管理器，无测试框架，无 linter。依赖：`requests`。
+
+## 敏感信息安全
+
+- **真实凭据只能放在 `data/config.json`**（已 gitignore），其余任何文件禁止出现真实 API Key、Token、推送地址
+- 文档、示例、实施计划中的配置示例统一使用占位符：`YOUR_API_KEY_HERE`、`YOUR_PUSH_URL_HERE`、`sk-...` 等
+- 凡是在代码或文档中出现 `api_key`、`push_url`、`token` 等字段名时，先确认写入的是变量引用还是真实值
+- 若不慎将凭据提交到 Git，立即告知团队成员，并：
+  1. 轮换密钥（旧密钥作废）
+  2. 用 `git filter-branch` 从全历史中清洗
+  3. `git push --force` 覆盖远程
+  4. 在 CLAUDE.md 中补充预防规则
+- `data/config.json` 不在提交范围内，但**复制其内容到文档/计划/示例中时**必须替换为占位符
 
 ## 文档管理
 
