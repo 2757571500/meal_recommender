@@ -46,11 +46,11 @@ def filter_dishes(dishes, profile):
     user_level = difficulty_order.get(profile.skill_level, 1)
 
     # diet_type 可保留的类型集合
-    # 用户无限制时保留全部；有限制时保留"匹配 + 无限制"
-    if profile.diet_type == "无限制":
+    # 用户不限时保留全部；有限制时保留"匹配 + 不限"菜品
+    if profile.diet_type == "不限":
         keep_diet_types = None  # None 表示全部保留
     else:
-        keep_diet_types = {profile.diet_type, "无限制"}
+        keep_diet_types = {profile.diet_type, "不限"}
 
     filtered = []
     for d in dishes:

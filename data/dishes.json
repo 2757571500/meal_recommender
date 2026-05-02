@@ -17,7 +17,7 @@
       "辣椒油",
       "花椒"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣",
       "含花生",
@@ -41,7 +41,7 @@
       "笋丁",
       "五花肉"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣"
     ]
@@ -64,7 +64,7 @@
       "鸭血",
       "毛肚（可选去内脏版）"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣"
     ]
@@ -85,7 +85,7 @@
       "春笋",
       "香葱"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": []
   },
   {
@@ -105,7 +105,7 @@
       "花椒",
       "花生"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣",
       "含花生",
@@ -129,7 +129,7 @@
       "春笋",
       "香菇"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含蛋",
       "含麸质"
@@ -153,7 +153,7 @@
       "豆瓣酱",
       "花椒粉"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣",
       "含麸质"
@@ -175,7 +175,7 @@
       "五花肉",
       "干辣椒"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣"
     ]
@@ -196,7 +196,7 @@
       "蒜末",
       "辣椒油"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣"
     ]
@@ -216,7 +216,7 @@
       "火腿",
       "笋干"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": []
   },
   {
@@ -236,7 +236,7 @@
       "干辣椒",
       "花椒"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣",
       "含海鲜"
@@ -258,7 +258,7 @@
       "豆豉",
       "蒜"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣"
     ]
@@ -280,7 +280,7 @@
       "腊肉",
       "青蒜"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣"
     ]
@@ -302,7 +302,7 @@
       "泡椒",
       "姜"
     ],
-    "diet_type": "无限制",
+    "diet_type": "不限",
     "dietary_tags": [
       "含辣",
       "含海鲜"
